@@ -17,8 +17,9 @@ class ChromeDriverFactoryTests(unittest.TestCase):
         with patch.dict("scraper.driver_factory.os.environ", {"CHROMEDRIVER_PATH": env_path}, clear=True):
             self.assertEqual(_detect_chromedriver_binary(), env_path)
 
+    @patch("scraper.driver_factory.Service")
     @patch("scraper.driver_factory.webdriver.Chrome")
-    def test_create_uses_explicit_service_for_local_driver(self, chrome):
+    def test_create_uses_explicit_service_for_local_driver(self, chrome, service_cls):
         factory = ChromeDriverFactory(
             binary_location="/usr/bin/google-chrome",
             driver_path="/usr/local/bin/chromedriver",
@@ -26,8 +27,9 @@ class ChromeDriverFactoryTests(unittest.TestCase):
 
         factory.create()
 
+        service_cls.assert_called_once_with(executable_path="/usr/local/bin/chromedriver")
         _, kwargs = chrome.call_args
-        self.assertEqual(kwargs["service"].path, "/usr/local/bin/chromedriver")
+        self.assertIs(kwargs["service"], service_cls.return_value)
         self.assertEqual(kwargs["options"].binary_location, "/usr/bin/google-chrome")
 
     @patch("scraper.driver_factory.webdriver.Chrome")
