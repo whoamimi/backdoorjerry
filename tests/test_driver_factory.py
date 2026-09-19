@@ -30,6 +30,19 @@ class ChromeDriverFactoryTests(unittest.TestCase):
         self.assertEqual(kwargs["service"].path, "/usr/local/bin/chromedriver")
         self.assertEqual(kwargs["options"].binary_location, "/usr/bin/google-chrome")
 
+    @patch("scraper.driver_factory.webdriver.Chrome")
+    def test_create_falls_back_when_local_driver_is_unavailable(self, chrome):
+        factory = ChromeDriverFactory(
+            binary_location="/usr/bin/google-chrome",
+            driver_path=None,
+        )
+
+        factory.create()
+
+        _, kwargs = chrome.call_args
+        self.assertIsNone(kwargs["service"])
+        self.assertEqual(kwargs["options"].binary_location, "/usr/bin/google-chrome")
+
 
 if __name__ == "__main__":
     unittest.main()
