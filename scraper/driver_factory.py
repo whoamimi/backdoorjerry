@@ -7,6 +7,7 @@ from typing import Optional, Tuple
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 
 
 def _detect_chrome_binary() -> Optional[str]:
@@ -14,7 +15,21 @@ def _detect_chrome_binary() -> Optional[str]:
     candidates = (
         os.environ.get("CHROME_BINARY_PATH"),
         "/usr/bin/google-chrome",
+        "/usr/bin/chromium",
         "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+    )
+    for candidate in candidates:
+        if candidate and os.path.isfile(candidate):
+            return candidate
+    return None
+
+
+def _detect_chromedriver_binary() -> Optional[str]:
+    """Locates a usable ChromeDriver binary across common install paths."""
+    candidates = (
+        os.environ.get("CHROMEDRIVER_PATH"),
+        "/usr/local/bin/chromedriver",
+        "/usr/bin/chromedriver",
     )
     for candidate in candidates:
         if candidate and os.path.isfile(candidate):
@@ -33,6 +48,7 @@ class ChromeDriverFactory:
     headless: bool = True
     window_size: Tuple[int, int] = (1920, 1080)
     binary_location: Optional[str] = field(default_factory=_detect_chrome_binary)
+    driver_path: Optional[str] = field(default_factory=_detect_chromedriver_binary)
     disable_images: bool = True
 
     def build_options(self) -> Options:
@@ -52,4 +68,10 @@ class ChromeDriverFactory:
         return options
 
     def create(self) -> webdriver.Chrome:
-        return webdriver.Chrome(options=self.build_options())
+        options = self.build_options()
+        if self.driver_path:
+            return webdriver.Chrome(
+                options=options,
+                service=Service(executable_path=self.driver_path),
+            )
+        return webdriver.Chrome(options=options)
