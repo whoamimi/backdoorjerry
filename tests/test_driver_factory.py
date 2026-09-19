@@ -43,6 +43,16 @@ class ChromeDriverFactoryTests(unittest.TestCase):
         self.assertIsNone(kwargs["service"])
         self.assertEqual(kwargs["options"].binary_location, "/usr/bin/google-chrome")
 
+    @patch("scraper.driver_factory.os.path.isfile")
+    def test_detect_chromedriver_binary_uses_default_local_path(self, isfile):
+        def fake_isfile(path):
+            return path == "/usr/local/bin/chromedriver"
+
+        isfile.side_effect = fake_isfile
+
+        with patch.dict("scraper.driver_factory.os.environ", {}, clear=True):
+            self.assertEqual(_detect_chromedriver_binary(), "/usr/local/bin/chromedriver")
+
 
 if __name__ == "__main__":
     unittest.main()

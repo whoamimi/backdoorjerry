@@ -8,5 +8,5 @@ RUN CHROME_MAJOR_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d. 
     && CHROMEDRIVER_VERSION=$(wget -q -O - "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_${CHROME_MAJOR_VERSION}") \
     && wget -q "https://storage.googleapis.com/chrome-for-testing-public/${CHROMEDRIVER_VERSION}/linux64/chromedriver-linux64.zip" -O /tmp/chromedriver-linux64.zip \
     && unzip -q /tmp/chromedriver-linux64.zip -d /tmp \
-    && install -m 0755 /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
+    && install -m 0755 /tmp/chromedriver-linux64/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
     && rm -rf /tmp/chromedriver-linux64 /tmp/chromedriver-linux64.zip
