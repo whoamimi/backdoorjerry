@@ -40,7 +40,7 @@ class ChromeDriverFactoryTests(unittest.TestCase):
         factory.create()
 
         _, kwargs = chrome.call_args
-        self.assertIsNone(kwargs["service"])
+        self.assertNotIn("service", kwargs)
         self.assertEqual(kwargs["options"].binary_location, "/usr/bin/google-chrome")
 
     @patch("scraper.driver_factory.os.path.isfile")
