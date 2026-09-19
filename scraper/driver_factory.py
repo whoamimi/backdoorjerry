@@ -68,9 +68,10 @@ class ChromeDriverFactory:
         return options
 
     def create(self) -> webdriver.Chrome:
+        options = self.build_options()
         if self.driver_path:
             return webdriver.Chrome(
-                options=self.build_options(),
+                options=options,
                 service=Service(executable_path=self.driver_path),
             )
-        return webdriver.Chrome(options=self.build_options())
+        return webdriver.Chrome(options=options)
